@@ -5,10 +5,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
-import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.label.FirebaseVisionLabelDetectorOptions
+import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceImageLabelerOptions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -25,7 +24,7 @@ class MainActivity : BActivity() {
             if (mBitmap != null) {
 
                 //Configure the detector//
-                val options = FirebaseVisionLabelDetectorOptions.Builder()
+                val options = FirebaseVisionOnDeviceImageLabelerOptions.Builder()
                     .setConfidenceThreshold(0.7f)
                     .build()
 
@@ -35,14 +34,17 @@ class MainActivity : BActivity() {
 
                 //Create an instance of FirebaseVisionLabelDetector//
 
-                val detector = FirebaseVision.getInstance().getVisionLabelDetector(options)
+                val detector = FirebaseVision.getInstance().getOnDeviceImageLabeler(options)
 
                 //Register an OnSuccessListener//
 
-                detector.detectInImage(image).addOnSuccessListener { labels ->
+                detector.processImage(image).addOnSuccessListener { labels ->
                     //Implement the onSuccess callback//
                     for (label in labels) {
-                        Log.d("ttt", label.label)
+                        val text = label.text
+                        val entityId = label.entityId
+                        val confidence = label.confidence
+                        Log.d("ttt", "text:$text entityId:$entityId confidence:$confidence")
                     }
                     Log.d("ttt", "--------------")
 
